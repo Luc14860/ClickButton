@@ -1,38 +1,61 @@
 package fr.click;
 
-import fr.click.gui.Frame;
-
-public class Timer implements Runnable {
+public class Timer {
+	long startTicks;
+	long pausedTicks;
+	boolean paused;
+	boolean started;
 	
-	public static boolean buttonHaveBeenClicked = true;
-	public static long score;
+	public Timer() {
+		startTicks = 0;
+		pausedTicks = 0;
+		paused = false;
+		started = false;
+	}
 	
-	public void run() {
-		while(buttonHaveBeenClicked) {
-			buttonHaveBeenClicked = false;
-			
-			if(3000 - (score * 10) > 0) {
-				try {
-					Thread.sleep(3000 - (score * 10));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			Frame.clickButton.setBounds((int)(Math.random() * ((Frame.frame.getWidth() - 100) - 0)) + 0, (int)(Math.random() * ((Frame.frame.getHeight() - 100) - 0)) + 0, 100, 100);
-			Frame.clickButton.setVisible(true);
-			
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+	public void start() {
+		started = true;
+		paused = false;
+		startTicks = System.currentTimeMillis();
+	}
+	
+	public void stop() {
+		started = false;
+		paused = false;
+	}
+	
+	public void pause() {
+		if (started == true && paused == false) {
+			paused = true;
+			pausedTicks = System.currentTimeMillis() - startTicks;
+		}
+	}
+	
+	public void unpaused() {
+		if (paused == true) {
+			paused = false;
+			startTicks = System.currentTimeMillis() - pausedTicks;
+			pausedTicks = 0;
+		}
+	}
+	
+	public int get_ticks() {
+		if (started == true) {
+			if (paused == true) {
+				return (int) pausedTicks;
+			} else {
+				return (int) (System.currentTimeMillis() - startTicks);
 			}
 		}
 		
-		Frame.clickButton.setEnabled(false);
-		
-		Frame.loseMessage.setVisible(true);
-		Frame.quitButton.setVisible(true);
-		Frame.quitButton.setBounds((Frame.frame.getWidth() / 2) - 100, (Frame.frame.getHeight() / 2) + 30, 200, 50);
+		return 0;
+	}
+	
+	public boolean is_started() {
+		return started;
+	}
+	
+	public boolean is_paused() {
+		return paused;
 	}
 }
